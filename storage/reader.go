@@ -5,19 +5,26 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"rapidkv-db/models"
 )
 
 // ReadFromLog reads a key-value pair from the log file starting at a given offset.
-func ReadFromLog(fileName string, searchKey string, offset int64) (string, error) {
+func GetValueFromDB(searchKey string) (string, error) {
+	_value, exist := models.GetDataFromMemory(searchKey)
+	fmt.Print("GetDataFromMemory: ", _value, exist)
+	if !exist {
+		return "", fmt.Errorf("key not found from memory")
+	}
 	// Open the log file
-	logFile, err := os.OpenFile(fmt.Sprintf("%s/%s", LOG_FILES_DIR, fileName), os.O_RDONLY, 0666)
+	logFile, err := os.OpenFile(fmt.Sprintf("%s/%s", LOG_FILES_DIR, _value.FileName), os.O_RDONLY, 0666)
 	if err != nil {
+		fmt.Print("Failed to open log file: ", err)
 		return "", fmt.Errorf("failed to open log file: %w", err)
 	}
 	defer logFile.Close()
 
 	// Seek to the specified offset
-	if _, err = logFile.Seek(offset, io.SeekStart); err != nil {
+	if _, err = logFile.Seek(_value.RecordPosition, io.SeekStart); err != nil {
 		return "", fmt.Errorf("failed to seek to offset: %w", err)
 	}
 
@@ -52,6 +59,7 @@ func ReadFromLog(fileName string, searchKey string, offset int64) (string, error
 	}
 
 	// Check if the key matches the search key
+	fmt.Print("key: ", string(key), " searchKey: ", searchKey)
 	if string(key) == searchKey {
 		return string(value), nil
 	}
