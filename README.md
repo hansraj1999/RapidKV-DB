@@ -15,6 +15,7 @@ A lightweight, persistent, and fast **Key-Value Database** inspired by the **Bit
 > cd rapidkv-db
 2. Build and run:
 > go build -o rapidkv-db ./cmd/main.go 
+
 > go run .\cmd\main.go
 
 ## Test APIs using **curl** or tools like **Postman**:
