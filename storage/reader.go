@@ -10,16 +10,20 @@ import (
 
 // ReadFromLog reads a key-value pair from the log file starting at a given offset.
 func GetValueFromDB(searchKey string) (string, error) {
-	_value, exist := models.GetDataFromMemory(searchKey)
-	fmt.Print("GetDataFromMemory: ", _value, exist)
-	if !exist {
+	_value, exists := models.GetDataFromMemory(searchKey)
+	var crc uint32
+	var timestamp int64
+	var keySize, valueSize int32
+
+	if !exists {
 		return "", fmt.Errorf("key not found from memory")
 	}
 	// Open the log file
-	logFile, err := os.OpenFile(fmt.Sprintf("%s/%s", LOG_FILES_DIR, _value.FileName), os.O_RDONLY, 0666)
+	logFilePath := fmt.Sprintf("%s/%s", LOG_FILES_DIR, _value.FileName)
+	logFile, err := os.OpenFile(logFilePath, os.O_RDONLY, 0666)
 	if err != nil {
 		fmt.Print("Failed to open log file: ", err)
-		return "", fmt.Errorf("failed to open log file: %w", err)
+		return "", fmt.Errorf("failed to open log file '%s': %w", logFilePath, err)
 	}
 	defer logFile.Close()
 
@@ -27,12 +31,7 @@ func GetValueFromDB(searchKey string) (string, error) {
 	if _, err = logFile.Seek(_value.RecordPosition, io.SeekStart); err != nil {
 		return "", fmt.Errorf("failed to seek to offset: %w", err)
 	}
-
 	// Read metadata: CRC, timestamp, keySize, valueSize
-	var crc uint32
-	var timestamp int64
-	var keySize, valueSize int32
-
 	if err := readBinary(logFile, &crc); err != nil {
 		return "", fmt.Errorf("failed to read CRC: %w", err)
 	}
@@ -64,7 +63,8 @@ func GetValueFromDB(searchKey string) (string, error) {
 		return string(value), nil
 	}
 
-	return "", fmt.Errorf("key not found")
+	return "", fmt.Errorf("key mismatch: expected '%s', found '%s'", searchKey, string(key))
+
 }
 
 // readBinary simplifies binary.Read calls
