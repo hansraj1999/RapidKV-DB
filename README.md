@@ -27,7 +27,7 @@ A lightweight, persistent, and fast **Key-Value Database** inspired by the **Bit
 }'
 
 2. Retrieve a value by key
-> curl --location 'http://localhost:9090/get?key=hans'
+    > curl --location 'http://localhost:9090/get?key=hans'
 
 ## 🛠️ **Configuration**
 -   Default port: `9090`
