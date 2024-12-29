@@ -47,7 +47,7 @@ A lightweight, persistent, and fast **Key-Value Database** inspired by the **Bit
 -   Fork the repository
 -   Create a new branch for your feature/bugfix
 -   Submit a pull request
-- 
+
 ## 📝 **License**
 
 This project is licensed under the **MIT License**.
