@@ -62,3 +62,4 @@ This project is licensed under the **MIT License**.
 - [ ]  Implement `MERGE` operation to compact and optimize log files.
 - [ ]  Add TTL (Time-To-Live) support for keys.
 - [ ]  Add data persistence validation on startup.
+- [ ]  Thread Safety.
