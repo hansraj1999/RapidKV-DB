@@ -8,3 +8,7 @@ const (
 	KeySizeSize   = 4
 	ValueSizeSize = 4
 )
+
+const (
+	MaxLogFileSize = 100 * 1024 * 1024 // 100MB
+)

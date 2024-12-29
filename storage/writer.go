@@ -8,8 +8,10 @@ import (
 	"rapidkv-db/utils"
 )
 
+var LogManager = NewLogFileManager()
+
 // AppendToLog appends a key-value pair to the log file and returns the offset and record size.
-func AppendToLog(fileName, key, value string) (int64, int, int64, error) {
+func AppendToLog(key, value string) (int64, int, int64, string, error) {
 	// Calculate metadata
 	crc := utils.CalculateCRC(key, value)
 	timestamp := utils.GetTimestamp()
@@ -18,24 +20,46 @@ func AppendToLog(fileName, key, value string) (int64, int, int64, error) {
 	recordSize := CRCSize + TimestampSize + KeySizeSize + ValueSizeSize + len(key) + len(value)
 
 	// Open log file
-	logFile, err := os.OpenFile(fmt.Sprintf("%s/%s", LOG_FILES_DIR, fileName), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	currentFile := LogManager.GetCurrentLogFile()
+	logFilePath := fmt.Sprintf("%s/%s", LOG_FILES_DIR, currentFile)
+	logFile, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
-		return 0, 0, 0, fmt.Errorf("failed to open log file: %w", err)
+		return 0, 0, 0, "", fmt.Errorf("failed to open log file: %w", err)
 	}
 	defer logFile.Close()
+	fileInfo, err := logFile.Stat()
+	if err != nil {
+		return 0, 0, 0, "", fmt.Errorf("failed to get file info: %w", err)
+	}
+
+	if fileInfo.Size() > MaxLogFileSize {
+		// Rotate log file
+		err := LogManager.RotateLogFile()
+		if err != nil {
+			return 0, 0, 0, "", err
+		}
+
+		currentFile = LogManager.GetCurrentLogFile()
+		logFilePath = fmt.Sprintf("%s/%s", LOG_FILES_DIR, currentFile)
+		logFile, err = os.OpenFile(logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+		if err != nil {
+			return 0, 0, 0, "", fmt.Errorf("failed to open new log file: %w", err)
+		}
+		defer logFile.Close()
+	}
 
 	// Get current file offset
 	offset, err := logFile.Seek(0, io.SeekEnd)
 	if err != nil {
-		return 0, 0, 0, fmt.Errorf("failed to seek log file: %w", err)
+		return 0, 0, 0, "", fmt.Errorf("failed to seek log file: %w", err)
 	}
 
 	// Write log entry
 	if err := WriteLogEntry(logFile, crc, timestamp, keySize, valueSize, key, value); err != nil {
-		return 0, 0, 0, fmt.Errorf("failed to write log entry: %w", err)
+		return 0, 0, 0, "", fmt.Errorf("failed to write log entry: %w", err)
 	}
 
-	return offset, recordSize, timestamp, nil
+	return offset, recordSize, timestamp, LogManager.GetCurrentLogFile(), nil
 }
 
 // WriteLogEntry writes a log entry with metadata and data to the log file.

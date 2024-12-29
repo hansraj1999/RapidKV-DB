@@ -60,6 +60,7 @@ This project is licensed under the **MIT License**.
 
 - [x] Implement `PUT` handler for writing key-value pairs.
 - [x]  Implement `GET` handler for retrieving key-value pairs.
+- [x]  File Rotation based on size.
 - [ ]  Implement `MERGE` operation to compact and optimize log files.
 - [ ]  Add TTL (Time-To-Live) support for keys.
 - [ ]  Add data persistence validation on startup.

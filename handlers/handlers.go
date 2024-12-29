@@ -20,13 +20,13 @@ func PutHandler(c *gin.Context) {
 		return
 	}
 
-	offset, recordSize, timestamp, err := storage.AppendToLog("log_1.log", payload.Key, payload.Value)
+	offset, recordSize, timestamp, fileName, err := storage.AppendToLog(payload.Key, payload.Value)
 	fmt.Println(offset, recordSize, timestamp, "Got from AppendToLog")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	models.AddToMemory("log_1.log", payload.Key, recordSize, offset, timestamp)
+	models.AddToMemory(fileName, payload.Key, recordSize, offset, timestamp)
 	c.JSON(http.StatusOK, gin.H{"message": "Key-Value pair added successfully"})
 }
 

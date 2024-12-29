@@ -22,7 +22,7 @@ func GetValueFromDB(searchKey string) (string, error) {
 	logFilePath := fmt.Sprintf("%s/%s", LOG_FILES_DIR, _value.FileName)
 	logFile, err := os.OpenFile(logFilePath, os.O_RDONLY, 0666)
 	if err != nil {
-		fmt.Print("Failed to open log file: ", err)
+		fmt.Print("Failed to open log file: ", err, "\n")
 		return "", fmt.Errorf("failed to open log file '%s': %w", logFilePath, err)
 	}
 	defer logFile.Close()
@@ -58,7 +58,7 @@ func GetValueFromDB(searchKey string) (string, error) {
 	}
 
 	// Check if the key matches the search key
-	fmt.Print("key: ", string(key), " searchKey: ", searchKey)
+	fmt.Print("key: ", string(key), " searchKey: ", searchKey, "\n")
 	if string(key) == searchKey {
 		return string(value), nil
 	}

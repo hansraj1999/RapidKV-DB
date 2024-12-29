@@ -30,14 +30,13 @@ func AddToMemory(FileName, Key string, RecordSize int, RecordPosition int64, Tim
 		FileName:       FileName,
 		Timestamp:      Timestamp,
 	}
-	fmt.Print("Adding to memory: ", _KeyDir)
+	fmt.Print("Adding to memory: ", _KeyDir, "\n")
 	InMemoryStorage[Key] = _KeyDir
-	fmt.Print("Added to memory: ", InMemoryStorage[FileName])
+	fmt.Print("Added to memory: ", InMemoryStorage[FileName], "\n")
 }
 func GetDataFromMemory(key string) (KeyDir, bool) {
-	fmt.Print("Getting from memory: ", InMemoryStorage)
 	value, exists := InMemoryStorage[key]
-	fmt.Print("Getting from memory: ", value)
+	fmt.Print("Getting from memory: ", value, "\n")
 	if !exists {
 		return value, exists
 	}
