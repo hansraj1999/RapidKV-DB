@@ -56,8 +56,6 @@ This project is licensed under the **MIT License**.
 
 ## 🚀 **TODO List**
 
-### 🔨 **Core Features**
-
 - [x] Implement `PUT` handler for writing key-value pairs.
 - [x]  Implement `GET` handler for retrieving key-value pairs.
 - [x]  File Rotation based on size.
