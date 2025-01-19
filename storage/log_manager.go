@@ -3,11 +3,13 @@ package storage
 import (
 	"fmt"
 	"os"
+	"sync"
 	"time"
 )
 
 // LogFileManager manages the current active log file
 type LogFileManager struct {
+	mu             sync.Mutex
 	CurrentLogFile string
 }
 
@@ -19,6 +21,7 @@ func NewLogFileManager() *LogFileManager {
 
 // RotateLogFile rotates the current log file when it exceeds MaxLogFileSize
 func (lm *LogFileManager) RotateLogFile() error {
+	lm.mu.Lock()
 	newFileName := fmt.Sprintf("log_%d.log", time.Now().Unix())
 	logFilePath := fmt.Sprintf("%s/%s", LOG_FILES_DIR, newFileName)
 
@@ -31,6 +34,7 @@ func (lm *LogFileManager) RotateLogFile() error {
 
 	// Update current log file
 	lm.CurrentLogFile = newFileName
+	lm.mu.Unlock()
 	return nil
 }
 

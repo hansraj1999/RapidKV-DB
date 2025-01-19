@@ -13,6 +13,7 @@ var LogManager = NewLogFileManager()
 // AppendToLog appends a key-value pair to the log file and returns the offset and record size.
 func AppendToLog(key, value string) (int64, int, int64, string, error) {
 	// Calculate metadata
+
 	crc := utils.CalculateCRC(key, value)
 	timestamp := utils.GetTimestamp()
 	keySize := int32(len(key))
